@@ -1,0 +1,8 @@
+black==19.10b0
+Django==3.0.8
+djangorestframework==3.11.0
+pylint==2.5.3
+pylint-django==2.0.15
+psycopg2-binary>=2.8
+
+
