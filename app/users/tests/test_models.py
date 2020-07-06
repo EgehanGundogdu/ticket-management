@@ -34,3 +34,10 @@ class UserModelTests(TestCase):
             email="test@test.com", password="supersecret", is_approved=True
         )
         self.assertTrue(hasattr(user, "profile"))
+
+    def test_no_profile_owned_normal_user(self):
+        "test that normal users will not have profiles."
+        user = get_user_model().objects.create_user(
+            email="test@test.com", password="normal", is_approved=True
+        )
+        self.assertFalse(hasattr(user, "profile"))

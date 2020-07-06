@@ -1,8 +1,8 @@
+"users app models."
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.utils.translation import gettext_lazy as _
-
-# Create your models here.
 
 
 class CustomUserManager(UserManager):
@@ -31,6 +31,7 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password, **extra_fields)
 
     def create_inactive_user(self, email, password=None, **extra_fields):
+        "creater method of inactive user."
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
         extra_fields.setdefault("is_company_admin", False)
@@ -61,6 +62,7 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password, **extra_fields)
 
     def create_company_admin(self, email, password=None, **extra_fields):
+        "creater method of company admin"
         extra_fields.setdefault("is_company_admin", True)
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", False)
@@ -95,4 +97,3 @@ class Profile(models.Model):
     class Meta:
         verbose_name = _("Profile")
         verbose_name_plural = _("Profiles")
-
