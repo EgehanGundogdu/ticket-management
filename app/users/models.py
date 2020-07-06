@@ -1,7 +1,10 @@
 "users app models."
 
-from django.db import models
+import uuid
+
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
@@ -91,9 +94,38 @@ class Profile(models.Model):
     """model that keeps profile information
     of company employees and officials."""
 
-    owner = models.OneToOneField(to=User, on_delete=models.CASCADE)
+    owner = models.OneToOneField(
+        to=User, on_delete=models.CASCADE, verbose_name=_("owner of profile")
+    )
     picture = models.ImageField(verbose_name=_("profile image"), blank=True)
 
     class Meta:
         verbose_name = _("Profile")
         verbose_name_plural = _("Profiles")
+
+
+class StaffInvitation(models.Model):
+    "model that hosts user invitations to the system."
+    inviter = models.ForeignKey(
+        to=settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="invitations",
+        verbose_name=_("creater of invitation"),
+    )
+    first_name = models.CharField(verbose_name=_("invited user name"), max_length=40)
+    last_name = models.CharField(verbose_name=_("invited last name"), max_length=40)
+    email = models.EmailField(verbose_name=_("invited user email"), unique=True)
+    token = models.CharField(
+        verbose_name=_("invite token"), editable=False, max_length=255
+    )
+    uuid = models.UUIDField(
+        verbose_name=_("unique uuid identifier"), default=uuid.uuid4
+    )
+    created = models.DateTimeField(_("invitation created datetime"), auto_now_add=True)
+    confirmed = models.BooleanField(
+        verbose_name=_("invite confirm status"), default=False
+    )
+
+    def __str__(self):
+        "string representation of invitation model instances. returns uuid first 8 char and token"
+        return f"{str(self.uuid)[0:8]} - {self.token}"
