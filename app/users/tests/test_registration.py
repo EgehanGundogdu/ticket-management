@@ -31,7 +31,7 @@ class StaffUsersRegisterTests(TestCase):
             "password2": "supersecret",
             "email": "test@test.com",
         }
-        res = self.client.post(reverse("register"), payload, "json")
+        res = self.client.post(reverse("accounts:register"), payload, "json")
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         user = get_user_model().objects.get(id=res.data["id"])
@@ -49,7 +49,7 @@ class StaffUsersRegisterTests(TestCase):
             "password2": "notmatched",
             "email": "test@test.com",
         }
-        res = self.client.post(reverse("register"), payload, "json")
+        res = self.client.post(reverse("accounts:register"), payload, "json")
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -62,24 +62,26 @@ class StaffUsersRegisterTests(TestCase):
             "password2": "123123",
             "email": "test@test.com",
         }
-        res = self.client.post(reverse("register"), payload, "json")
+        res = self.client.post(reverse("accounts:register"), payload, "json")
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_succcess_message_in_response(self):
         "test success message"
-        res = self.client.post(reverse("register"), self.registration_data)
+        res = self.client.post(reverse("accounts:register"), self.registration_data)
         self.assertEqual(
             res.data["message"], "Check your email and activate your account."
         )
 
     def test_create_activate_account(self):
         """test try to user activate accouns"""
-        res = self.client.post(reverse("register"), self.registration_data, "json")
+        res = self.client.post(
+            reverse("accounts:register"), self.registration_data, "json"
+        )
         user = get_user_model().objects.last()
         self.assertFalse(user.is_active)
         uid_and_token = uid_token_generator(user)
-        res = self.client.get(reverse("activate", kwargs=uid_and_token))
+        res = self.client.get(reverse("accounts:activate", kwargs=uid_and_token))
         user.refresh_from_db()
         self.assertEqual(user.is_active, True)
         self.assertEqual(user.is_approved, True)

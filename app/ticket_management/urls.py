@@ -19,6 +19,5 @@ from users import api
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("register/", api.RegisterCompanyAdmin.as_view(), name="register"),
-    path("activate/<uidb64>/<token>/", api.ActivateAccount.as_view(), name="activate"),
+    path("api/accounts/", include("users.urls")),
 ]

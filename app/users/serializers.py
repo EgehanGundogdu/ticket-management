@@ -4,6 +4,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import (
     validate_password as auth_validate_password,
 )
+from rest_framework.authtoken.serializers import (
+    AuthTokenSerializer as BaseAuthTokenSerializer,
+)
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
+
 
 UserModel = get_user_model()
 
@@ -42,3 +48,32 @@ class StaffUserRegisterSerializer(serializers.ModelSerializer):
         """create new company admin user with validated data."""
         validated_data.pop("password2")
         return UserModel.objects.create_company_admin(**validated_data)
+
+
+class AuthTokenSerializer(BaseAuthTokenSerializer):
+    """obtain auth token serializer"""
+
+    username = None
+    email = serializers.EmailField(label=_("email"))
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get("request"), email=email, password=password,
+            )
+
+            # The authenticate call simply returns None for is_active=False
+            # users. (Assuming the default ModelBackend authentication
+            # backend.)
+            if not user:
+                msg = _("Unable to log in with provided credentials.")
+                raise serializers.ValidationError(msg, code="authorization")
+        else:
+            msg = _('Must include "username" and "password".')
+            raise serializers.ValidationError(msg, code="authorization")
+
+        attrs["user"] = user
+        return attrs
