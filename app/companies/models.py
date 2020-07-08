@@ -46,10 +46,7 @@ class Department(models.Model):
 
     name = models.CharField(max_length=40, verbose_name=_("department Name"))
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        blank=True,
-        related_name="departments",
-        verbose_name=_("department users"),
+        settings.AUTH_USER_MODEL, blank=True, verbose_name=_("department users"),
     )
     company = models.ForeignKey(
         to=Company, on_delete=models.CASCADE, related_name="departments"
