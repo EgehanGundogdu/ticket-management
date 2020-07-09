@@ -1,15 +1,15 @@
 "serializers of users application"
-from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import (
     validate_password as auth_validate_password,
 )
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 from rest_framework.authtoken.serializers import (
     AuthTokenSerializer as BaseAuthTokenSerializer,
 )
-from django.contrib.auth import authenticate
-from django.utils.translation import gettext_lazy as _
 
+from .models import StaffInvitation
 
 UserModel = get_user_model()
 
@@ -77,3 +77,26 @@ class AuthTokenSerializer(BaseAuthTokenSerializer):
 
         attrs["user"] = user
         return attrs
+
+
+class StaffInvitationSerializer(serializers.ModelSerializer):
+    "serializes to staff invitation instances."
+
+    class Meta:
+        "meta class definition for staffinvitatitonserializer."
+        model = StaffInvitation
+        fields = ["first_name", "last_name", "email", "confirmed", "created"]
+        read_only_fields = ["confirmed", "created"]
+
+    def validate_email(self, value):
+        """check email exist in user model or invitation models 
+            email must be unique for user model."""
+        if (
+            UserModel.objects.filter(email=value).exists()
+            or StaffInvitation.objects.filter(email=value).exists()
+        ):
+            raise serializers.ValidationError(
+                _("a registered user or previously invited this e-mail address.")
+            )
+
+        return value

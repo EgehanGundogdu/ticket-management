@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "users.apps.UsersConfig",
     "companies.apps.CompaniesConfig",
+    "tickets.apps.TicketsConfig",
 ]
 
 MIDDLEWARE = [
