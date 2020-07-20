@@ -25,5 +25,5 @@ from tickets.api import TicketViewSet  # noqa
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/tickets/", include("tickets.urls")),
-    path("api/accounts/", include("users.urls")),
+    path("api/accounts/", include("users.api.urls")),
 ]
