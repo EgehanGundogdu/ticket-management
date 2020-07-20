@@ -1,13 +1,12 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
-from ..serializers import StaffUserRegisterSerializer
 from django.urls import reverse
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from ..utils import uid_token_generator
 
 
-class StaffUsersRegisterTests(TestCase):
+class CompanyAdminRegistration(TestCase):
     """
     tests of registration staff users to the system.
     """

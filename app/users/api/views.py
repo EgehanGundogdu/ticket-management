@@ -5,9 +5,10 @@ from rest_framework import generics, response, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .. import models, serializers
+from users.api import serializers  # noqa
 from ..token_handlers import account_activate_token_handler
 from ..utils import send_confirmation_email_user
+
 
 UserModel = get_user_model()
 
@@ -43,7 +44,7 @@ class RegisterCompanyAdmin(generics.CreateAPIView):
     Registration api view for company admins.
     """
 
-    serializer_class = serializers.StaffUserRegisterSerializer
+    serializer_class = serializers.CompanyAdminRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
         """call createapiviews create method and add custom message on response."""

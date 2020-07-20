@@ -8,6 +8,4 @@ urlpatterns = [
     path(
         "activate/<uidb64>/<token>/", views.ActivateAccount.as_view(), name="activate"
     ),
-    # path("obtain-token/", views.ObtainAuthToken.as_view(), name="obtain-token"),
 ]
-
