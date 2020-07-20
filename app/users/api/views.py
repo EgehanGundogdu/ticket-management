@@ -1,10 +1,13 @@
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_text
-from ..token_handlers import account_activate_token_handler
 from django.contrib.auth import get_user_model
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from rest_framework import generics, response, status
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.views import APIView
+
+from .. import models, serializers
+from ..token_handlers import account_activate_token_handler
+from ..utils import send_confirmation_email_user
 
 UserModel = get_user_model()
 
@@ -33,3 +36,22 @@ class ActivateAccount(APIView):
             data={"message": "Link is invalid. Try again"},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class RegisterCompanyAdmin(generics.CreateAPIView):
+    """
+    Registration api view for company admins.
+    """
+
+    serializer_class = serializers.StaffUserRegisterSerializer
+
+    def create(self, request, *args, **kwargs):
+        """call createapiviews create method and add custom message on response."""
+        response = super().create(request, *args, **kwargs)
+        response.data["message"] = "Check your email and activate your account."
+        return response
+
+    def perform_create(self, serializer):
+        """save the serializer and send confirmation mail"""
+        created = serializer.save()
+        send_confirmation_email_user(self.request, created)
