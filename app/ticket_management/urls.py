@@ -15,9 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from users import api
+
+from rest_framework import routers
+from tickets.api import TicketViewSet  # noqa
+
+# router = routers.DefaultRouter()
+# router.register("tickets", TicketViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/tickets/", include("tickets.urls")),
     path("api/accounts/", include("users.urls")),
 ]
