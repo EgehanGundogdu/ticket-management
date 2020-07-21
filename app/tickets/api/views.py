@@ -20,7 +20,6 @@ class TicketViewSet(viewsets.ModelViewSet):
         if user.is_company_admin:
             return self.queryset.filter(Q(company__leader=user))
         elif user.is_staff:
-
             return self.queryset.filter(Q(department__members__id=user.id))
         return self.queryset.filter(owner=self.request.user)
 
