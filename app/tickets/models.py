@@ -24,13 +24,19 @@ class TimeStampMixin(models.Model):
 class Activity(models.Model):
     """activity model for actions on system."""
 
+    COMMENTED = "C"
+    LOCKED = "L"
+    UNLOCKED = "U"
+    OPENED = "O"
+    UPDATED = "UP"
+    ATTACHED = "AT"
     ACTIONS = (
-        ("C", _("commented")),
-        ("L", _("locked")),
-        ("U", _("unlocked")),
-        ("O", _("opened")),
-        ("UP", _("updated")),
-        ("AT", _("attached")),
+        (COMMENTED, _("commented")),
+        (LOCKED, _("locked")),
+        (UNLOCKED, _("unlocked")),
+        (OPENED, _("opened")),
+        (UPDATED, _("updated")),
+        (ATTACHED, _("attached")),
     )
 
     owner = models.ForeignKey(
@@ -113,7 +119,7 @@ class Ticket(TimeStampMixin):
         verbose_name_plural = _("Tickets")
 
     def __str__(self):
-        return f"ticket {self.identifier} owner: {self.user.get_full_name()}"
+        return f"ticket {self.identifier} owner: {self.owner.get_full_name()}"
 
 
 class TicketComment(TimeStampMixin):
