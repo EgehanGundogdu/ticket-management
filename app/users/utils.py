@@ -39,3 +39,57 @@ def send_confirmation_email_user(request, instance) -> bool:
         fail_silently=True,
     )
     return email
+
+
+import random
+import string
+
+
+def get_random_alphanumeric_string(letters_count, digits_count):
+    sample_str = "".join(
+        (random.choice(string.ascii_letters) for i in range(letters_count))
+    )
+    sample_str += "".join((random.choice(string.digits) for i in range(digits_count)))
+
+    # Convert string to list and shuffle it to mix letters and digits
+    sample_list = list(sample_str)
+    random.shuffle(sample_list)
+    final_string = "".join(sample_list)
+    return final_string
+
+
+def send_invitation_confirm_email(request, invited) -> bool:
+    """
+    When the company representative is registered, 
+    sending an e-mail to activate his account
+    """
+    mail_subject = "Confirm your invitation."
+    current_site = get_current_site(request)
+
+    if isinstance(invited, list):
+        for i in invited:
+            message = render_to_string(
+                "users/confirm_invitation.html",
+                {"invited": i, "domain": current_site.domain,},
+            )
+            email = send_mail(
+                mail_subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                (i.email,),
+                fail_silently=True,
+            )
+            return email
+    else:
+        message = render_to_string(
+            "users/confirm_invitation.html",
+            {"invited": invited, "domain": current_site.domain,},
+        )
+        return send_mail(
+            mail_subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            (invited,),
+            fail_silently=True,
+        )
+

@@ -8,6 +8,12 @@ from rest_framework_simplejwt.views import (
 
 app_name = "accounts"
 urlpatterns = [
+    path("invite/", views.CompanyStaffEmployeeInvite.as_view(), name="invite"),
+    path(
+        "invite/confirm/<uuid:uuid>/",
+        views.InviteConfirm.as_view(),
+        name="invite-confirm",
+    ),
     path("token/obtain/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),

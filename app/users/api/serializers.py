@@ -8,7 +8,8 @@ from rest_framework import serializers
 from rest_framework.authtoken.serializers import (
     AuthTokenSerializer as BaseAuthTokenSerializer,
 )
-
+from users.models import Invitation
+from companies.models import Company, Department
 
 UserModel = get_user_model()
 
@@ -49,53 +50,38 @@ class CompanyAdminRegistrationSerializer(serializers.ModelSerializer):
         return UserModel.objects.create_company_admin(**validated_data)
 
 
-# class AuthTokenSerializer(BaseAuthTokenSerializer):
-#     """obtain auth token serializer"""
-
-#     username = None
-#     email = serializers.EmailField(label=_("email"))
-
-#     def validate(self, attrs):
-#         email = attrs.get("email")
-#         password = attrs.get("password")
-
-#         if email and password:
-#             user = authenticate(
-#                 request=self.context.get("request"), email=email, password=password,
-#             )
-
-#             # The authenticate call simply returns None for is_active=False
-#             # users. (Assuming the default ModelBackend authentication
-#             # backend.)
-#             if not user:
-#                 msg = _("Unable to log in with provided credentials.")
-#                 raise serializers.ValidationError(msg, code="authorization")
-#         else:
-#             msg = _('Must include "username" and "password".')
-#             raise serializers.ValidationError(msg, code="authorization")
-
-#         attrs["user"] = user
-#         return attrs
+from ..token_handlers import inviation_token_manager
+from ..utils import send_invitation_confirm_email
 
 
-# class StaffInvitationSerializer(serializers.ModelSerializer):
-#     "serializes to staff invitation instances."
+class CompanyStaffInviteSerializer(serializers.ModelSerializer):
+    company = serializers.PrimaryKeyRelatedField(
+        queryset=Company.objects.all(), write_only=True
+    )
+    department = serializers.PrimaryKeyRelatedField(
+        queryset=Department.objects.all(), write_only=True, required=False
+    )
 
-#     class Meta:
-#         "meta class definition for staffinvitatitonserializer."
-#         model = StaffInvitation
-#         fields = ["first_name", "last_name", "email", "confirmed", "created"]
-#         read_only_fields = ["confirmed", "created"]
+    class Meta:
+        model = Invitation
+        exclude = ("inviter",)
+        read_only_fields = ("id", "confirmed", "inviter", "uuid")
 
-#     def validate_email(self, value):
-#         """check email exist in user model or invitation models
-#             email must be unique for user model."""
-#         if (
-#             UserModel.objects.filter(email=value).exists()
-#             or StaffInvitation.objects.filter(email=value).exists()
-#         ):
-#             raise serializers.ValidationError(
-#                 _("a registered user or previously invited this e-mail address.")
-#             )
+    def create(self, validated_data):
+        if validated_data.get("department") is None:
+            token = inviation_token_manager.encode_token(validated_data["company"].id)
+            validated_data.pop("company")
+        else:
+            token = inviation_token_manager.encode_token(
+                validated_data["company"].id, validated_data["department"].id
+            )
+            validated_data.pop("company")
+            validated_data.pop("department")
+        validated_data["token"] = token
+        instance = super().create(validated_data)
 
-#         return value
+        # send_invitation_confirm_email(
+        #     request=self.context.get("request"), invited=instance
+        # )
+        return instance
+

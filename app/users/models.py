@@ -104,7 +104,7 @@ class Profile(models.Model):
         verbose_name_plural = _("Profiles")
 
 
-class StaffInvitation(models.Model):
+class Invitation(models.Model):
     "model that hosts user invitations to the system."
     inviter = models.ForeignKey(
         to=settings.AUTH_USER_MODEL,
@@ -112,7 +112,7 @@ class StaffInvitation(models.Model):
         related_name="invitations",
         verbose_name=_("creater of invitation"),
     )
-    first_name = models.CharField(verbose_name=_("invited user name"), max_length=40)
+    first_name = models.CharField(verbose_name=_("invited first name"), max_length=40)
     last_name = models.CharField(verbose_name=_("invited last name"), max_length=40)
     email = models.EmailField(verbose_name=_("invited user email"), unique=True)
     token = models.CharField(
@@ -125,6 +125,7 @@ class StaffInvitation(models.Model):
     confirmed = models.BooleanField(
         verbose_name=_("invite confirm status"), default=False
     )
+    is_staff = models.BooleanField(_("is staff"))
 
     def __str__(self):
         "string representation of invitation model instances. returns uuid first 8 char and token"

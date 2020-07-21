@@ -9,14 +9,16 @@ from hashids import Hashids
 
 
 class InvitationsTokenHandler(Hashids):
-    def encode_token(self, company_id, department_id):
+    def encode_token(self, company_id, department_id=None):
         """
         returned min 25 character token. example (1,2) return o5ZpBQ8J0yelYfoaER7OYMzWx
         params
         :company id. -> the unique key of the company to which the user is invited.
         :department id. -> the unique key of the company department to which the user is invited.
         """
-        return self.encode(company_id, department_id)
+        if department_id is not None:
+            return self.encode(company_id, department_id)
+        return self.encode(company_id)
 
     def decode_token(self, token):
         """

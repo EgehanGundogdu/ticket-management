@@ -1,0 +1,6 @@
+{% autoescape off %}
+Hi {{ invited.first_name }},
+{{invited.inviter.get_full_name}} invites you the join system!
+Please click on the link below to
+http://{{ domain }}{% url 'accounts:invite-confirm' uuid=invited.uuid %}
+{% endautoescape %}
