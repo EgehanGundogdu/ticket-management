@@ -18,6 +18,7 @@ class CustomUser(BaseUserAdmin):
                 "fields": (
                     "is_active",
                     "is_staff",
+                    "is_company_admin",
                     "is_superuser",
                     "groups",
                     "user_permissions",

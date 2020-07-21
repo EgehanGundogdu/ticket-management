@@ -17,13 +17,21 @@ from django.contrib import admin
 from django.urls import path, include
 
 from rest_framework import routers
-from tickets.api import TicketViewSet  # noqa
+
+# from tickets.api import TicketViewSet  # noqa
+from django.conf import settings
 
 # router = routers.DefaultRouter()
 # router.register("tickets", TicketViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/tickets/", include("tickets.urls")),
+    path("api/tickets/", include("tickets.api.urls")),
     path("api/accounts/", include("users.api.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns.append(
+        path("api/rest-auth/", include("rest_framework.urls"))
+    )  # for browsable api login logout.
+
